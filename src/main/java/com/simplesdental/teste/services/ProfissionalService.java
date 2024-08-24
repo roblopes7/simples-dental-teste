@@ -13,4 +13,6 @@ public interface ProfissionalService {
     Profissional consultarProfissional(UUID id);
 
     Profissional atualizarProfissional(ProfissionalCommand command);
+
+    void removerProfissional(UUID id);
 }

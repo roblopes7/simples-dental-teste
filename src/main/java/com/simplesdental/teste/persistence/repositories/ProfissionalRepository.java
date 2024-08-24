@@ -9,4 +9,6 @@ public interface ProfissionalRepository {
     Profissional salvarProfissional(Profissional profissional);
 
     Optional<Profissional> findById(UUID id);
+
+    void inativarProfissional(Profissional profissional);
 }

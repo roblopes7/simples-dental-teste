@@ -187,4 +187,36 @@ public class ProfissionalServiceTest {
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains("Profissional de ID: " + uuidUtils.getUuidPadrao() + " não encontrado"));
     }
+
+    //DETETE de profissionais
+
+    @Test
+    @DisplayName("Remover Profissional com sucesso")
+    void removerProfissionalTest() {
+        var profissional = ProfissionalTest.criaProfissional();
+        profissional.setId(uuidUtils.getUuidPadrao());
+        when(profissionalRepository.salvarProfissional(any(Profissional.class)))
+                .thenReturn(profissional);
+        Profissional profissionalSalvo = profissionalService.adicionarProfissional(CriaProfissionalCommandTest.criarCommandProfissional());
+
+        when(profissionalRepository.findById(any(UUID.class))).thenReturn(Optional.of(profissional));
+
+        profissionalService.removerProfissional(uuidUtils.getUuidPadrao());
+
+        verify(profissionalRepository, Mockito.times(1)).inativarProfissional(any());
+    }
+
+    @Test
+    @DisplayName("Remover Profissional inexistente")
+    void removerProfissionalInexistenteTest() {;
+        when(profissionalRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+
+        ObjetoNaoEncontradoException exception = assertThrows(ObjetoNaoEncontradoException.class, () -> {
+            profissionalService.removerProfissional(uuidUtils.getUuidPadrao());
+        });
+
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains("Profissional de ID: " + uuidUtils.getUuidPadrao() + " não encontrado"));
+    }
+
 }

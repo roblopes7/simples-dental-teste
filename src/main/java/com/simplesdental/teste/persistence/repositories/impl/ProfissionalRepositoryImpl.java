@@ -24,14 +24,7 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
 
     @Override
     public Profissional salvarProfissional(Profissional profissional) {
-        var entity = ProfissionalEntity.builder()
-                .id(profissional.getId())
-                .nome(profissional.getNome())
-                .cargo(Cargo.valueOf(profissional.getCargo()))
-                .dataNascimento(profissional.getDataNascimento())
-                .contatos(profissional.getContatos().stream().map(this::toContatoEntity).toList())
-                .createdDate(profissional.getCreatedDate())
-                .build();
+        var entity = toEntity(profissional);
 
         if (entity.getId() == null) {
             entity.setCreatedDate(LocalDate.now());
@@ -44,6 +37,22 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
     public Optional<Profissional> findById(UUID id) {
         Optional<ProfissionalEntity> optionalEntity = profissionalRepositoryJPA.findById(id);
         return optionalEntity.map(this::toDomain);
+    }
+
+    @Override
+    public void inativarProfissional(Profissional profissional) {
+        profissionalRepositoryJPA.inativarProfissional(profissional.getId());
+    }
+
+    private ProfissionalEntity toEntity(Profissional profissional) {
+        return ProfissionalEntity.builder()
+                .id(profissional.getId())
+                .nome(profissional.getNome())
+                .cargo(Cargo.valueOf(profissional.getCargo()))
+                .dataNascimento(profissional.getDataNascimento())
+                .contatos(profissional.getContatos().stream().map(this::toContatoEntity).toList())
+                .createdDate(profissional.getCreatedDate())
+                .build();
     }
 
     private ContatoEntity toContatoEntity(Contato contato) {

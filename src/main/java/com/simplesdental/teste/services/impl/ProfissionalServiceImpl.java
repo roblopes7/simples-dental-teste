@@ -62,6 +62,12 @@ public class ProfissionalServiceImpl implements ProfissionalService {
         return salvarProfissional(profissional);
     }
 
+    @Override
+    public void removerProfissional(UUID id) {
+        var profissional = consultarProfissional(id);
+        profissionalRepository.inativarProfissional(profissional);
+    }
+
     public Profissional salvarProfissional(Profissional profissional) {
         return profissionalRepository.salvarProfissional(profissional);
     }

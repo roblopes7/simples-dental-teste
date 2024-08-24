@@ -62,4 +62,11 @@ public class ProfissionalController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> removerProfissional(@PathVariable("id") UUID id){
+        LOG.info("m=removerProfissional id={}", id);
+        profissionalService.removerProfissional(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

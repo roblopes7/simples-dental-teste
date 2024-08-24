@@ -3,7 +3,6 @@ package com.simplesdental.teste.persistence.entities;
 import com.simplesdental.teste.models.enums.Cargo;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -35,7 +34,10 @@ public class ProfissionalEntity {
     @Column(name = "created_date", nullable = false, updatable = false)
     private LocalDate createdDate;
 
-    @OneToMany(mappedBy = "profissional", cascade = CascadeType.ALL,
-            orphanRemoval = true, targetEntity = ContatoEntity.class)
+    @Column(name = "inativo")
+    private boolean inativo = false;
+
+    @OneToMany(mappedBy = "profissional", cascade = {},
+            targetEntity = ContatoEntity.class)
     private List<ContatoEntity> contatos = new ArrayList<>();
 }
