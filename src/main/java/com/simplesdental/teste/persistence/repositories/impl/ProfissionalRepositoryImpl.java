@@ -10,6 +10,8 @@ import com.simplesdental.teste.persistence.repositories.ProfissionalRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class ProfissionalRepositoryImpl implements ProfissionalRepository {
@@ -36,6 +38,12 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
         }
 
         return toDomain(profissionalRepositoryJPA.save(entity));
+    }
+
+    @Override
+    public Optional<Profissional> findById(UUID id) {
+        Optional<ProfissionalEntity> optionalEntity = profissionalRepositoryJPA.findById(id);
+        return optionalEntity.map(this::toDomain);
     }
 
     private ContatoEntity toContatoEntity(Contato contato) {

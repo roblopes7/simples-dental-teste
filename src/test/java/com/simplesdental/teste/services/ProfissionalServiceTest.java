@@ -3,10 +3,12 @@ package com.simplesdental.teste.services;
 import com.simplesdental.teste.commands.CriaProfissionalCommand;
 import com.simplesdental.teste.models.Profissional;
 import com.simplesdental.teste.persistence.repositories.ProfissionalRepository;
+import com.simplesdental.teste.services.exceptions.ObjetoNaoEncontradoException;
 import com.simplesdental.teste.services.exceptions.ValidationException;
 import com.simplesdental.teste.services.impl.ProfissionalServiceImpl;
 import com.simplesdental.teste.utils.CriaProfissionalCommandTest;
 import com.simplesdental.teste.utils.ProfissionalTest;
+import com.simplesdental.teste.utils.UuidUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,8 +21,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,12 +34,15 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("test")
 public class ProfissionalServiceTest {
 
+    private final UuidUtils uuidUtils = new UuidUtils();
+
     @Mock
     private ProfissionalRepository profissionalRepository;
 
     @InjectMocks
     private ProfissionalServiceImpl profissionalService;
 
+    // TESTES para POST
     @Test
     @DisplayName("Cadastro Profissional com sucesso")
     void cadastrarProfissionalTest() {
@@ -62,7 +69,10 @@ public class ProfissionalServiceTest {
         ValidationException exception = assertThrows(ValidationException.class, () -> {
             var command = new CriaProfissionalCommand(null, "DESENVOLVEDOR", LocalDate.of(2000, 8, 24));
             profissionalService.adicionarProfissional(command);
-        }, "Campo nome vazio.");
+        });
+
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains("Campo nome vazio."));
     }
 
     @Test
@@ -71,7 +81,10 @@ public class ProfissionalServiceTest {
         ValidationException exception = assertThrows(ValidationException.class, () -> {
             var command = new CriaProfissionalCommand("Teste", "", LocalDate.of(2000, 8, 24));
             profissionalService.adicionarProfissional(command);
-        }, "Campo cargo vazio.");
+        });
+
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains("Campo cargo vazio."));
     }
 
     @Test
@@ -80,7 +93,10 @@ public class ProfissionalServiceTest {
         ValidationException exception = assertThrows(ValidationException.class, () -> {
             var command = new CriaProfissionalCommand("Teste", null, LocalDate.of(2000, 8, 24));
             profissionalService.adicionarProfissional(command);
-        }, "Campo cargo vazio.");
+        });
+
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains("Campo cargo vazio."));
     }
 
     @Test
@@ -89,7 +105,40 @@ public class ProfissionalServiceTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             var command = new CriaProfissionalCommand("Teste", "Invalido", LocalDate.of(2000, 8, 24));
             profissionalService.adicionarProfissional(command);
-        }, "Cargo inválido: Invalido");
+        });
+
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains("Cargo inválido: Invalido"));
+
+    }
+
+    //TESTES para GET por id
+
+    @Test
+    @DisplayName("Consultar Profissional com sucesso")
+    void consultarProfissionalComSucessoTest() {
+        Optional<Profissional> profissional = Optional.ofNullable(ProfissionalTest.criaProfissional());
+        profissional.get().setId(uuidUtils.getUuidPadrao());
+        when(profissionalRepository.findById(any(UUID.class))).thenReturn(profissional);
+
+        Profissional consulta = profissionalService.consultarProfissional(uuidUtils.getUuidPadrao());
+
+        assertNotNull(consulta);
+        verify(profissionalRepository, Mockito.times(1)).findById(any());
+        Assertions.assertThat(consulta.getId()).isEqualTo(uuidUtils.getUuidPadrao());
+    }
+
+    @Test
+    @DisplayName("Consultar Profissional inexistente")
+    void consultarProfissionalInexistenteTest() {;
+        when(profissionalRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+
+        ObjetoNaoEncontradoException exception = assertThrows(ObjetoNaoEncontradoException.class, () -> {
+            profissionalService.consultarProfissional(uuidUtils.getUuidPadrao());
+        });
+
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains("Profissional de ID: " + uuidUtils.getUuidPadrao() + " não encontrado"));
     }
 
 }

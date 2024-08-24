@@ -5,11 +5,14 @@ import com.simplesdental.teste.models.Profissional;
 import com.simplesdental.teste.models.enums.Cargo;
 import com.simplesdental.teste.persistence.repositories.ProfissionalRepository;
 import com.simplesdental.teste.services.ProfissionalService;
+import com.simplesdental.teste.services.exceptions.ObjetoNaoEncontradoException;
 import com.simplesdental.teste.services.exceptions.ValidationException;
 import com.simplesdental.teste.services.utils.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ProfissionalServiceImpl implements ProfissionalService {
@@ -34,6 +37,17 @@ public class ProfissionalServiceImpl implements ProfissionalService {
         return salvarProfissional(profissional);
     }
 
+    @Override
+    public Profissional consultarProfissional(UUID id) {
+        Optional<Profissional> profissional = profissionalRepository.findById(id);
+
+        if (profissional.isEmpty()) {
+            throw new ObjetoNaoEncontradoException("Profissional de ID: " + id + " não encontrado");
+        }
+
+        return profissional.get();
+    }
+
     public Profissional salvarProfissional(Profissional profissional) {
         return profissionalRepository.salvarProfissional(profissional);
     }
@@ -43,9 +57,9 @@ public class ProfissionalServiceImpl implements ProfissionalService {
             throw new ValidationException("Campo nome vazio.");
         }
 
-        if(StringUtils.isBlank(profissional.getCargo())) {
+        if (StringUtils.isBlank(profissional.getCargo())) {
             throw new ValidationException("Campo cargo vazio.");
-        }else {
+        } else {
             try {
                 Cargo.valueOf(profissional.getCargo());
             } catch (IllegalArgumentException e) {
