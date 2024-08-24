@@ -1,6 +1,7 @@
 package com.simplesdental.teste.controllers;
 
 import com.simplesdental.teste.dtos.requests.NovoProfissionalRequest;
+import com.simplesdental.teste.dtos.requests.ProfissionalRequest;
 import com.simplesdental.teste.dtos.responses.ProfissionalResponse;
 import com.simplesdental.teste.services.ProfissionalService;
 import org.slf4j.Logger;
@@ -44,6 +45,21 @@ public class ProfissionalController {
         var profissional = profissionalService.consultarProfissional(id);
 
         return new ResponseEntity<>(ProfissionalResponse.fromDomain(profissional), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProfissionalResponse> atualizarProfissional(
+            @PathVariable("id") UUID id,
+            @RequestBody ProfissionalRequest request) {
+        LOG.info("m=atualizarProfissional request={}", request);
+
+        var command = request.toCommand(id);
+
+        var profissional = profissionalService.atualizarProfissional(command);
+
+        var response = ProfissionalResponse.fromDomain(profissional);
+
+        return ResponseEntity.ok(response);
     }
 
 }

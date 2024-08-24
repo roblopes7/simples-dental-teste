@@ -1,6 +1,7 @@
 package com.simplesdental.teste.services.impl;
 
 import com.simplesdental.teste.commands.CriaProfissionalCommand;
+import com.simplesdental.teste.commands.ProfissionalCommand;
 import com.simplesdental.teste.models.Profissional;
 import com.simplesdental.teste.models.enums.Cargo;
 import com.simplesdental.teste.persistence.repositories.ProfissionalRepository;
@@ -46,6 +47,19 @@ public class ProfissionalServiceImpl implements ProfissionalService {
         }
 
         return profissional.get();
+    }
+
+    @Override
+    public Profissional atualizarProfissional(ProfissionalCommand command) {
+        Profissional profissional = consultarProfissional(command.id());
+
+        profissional.setNome(command.nome());
+        profissional.setCargo(command.cargo());
+        profissional.setDataNascimento(command.dataNascimento());
+
+        validarProfissional(profissional);
+
+        return salvarProfissional(profissional);
     }
 
     public Profissional salvarProfissional(Profissional profissional) {
