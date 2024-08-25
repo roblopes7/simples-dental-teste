@@ -16,4 +16,13 @@ public enum Cargo {
     public String toString() {
         return this.descricao;
     }
+
+    public static Cargo toEnum(String descricao) {
+        for (Cargo cargo : Cargo.values()) {
+            if (cargo.descricao.equals(descricao) || cargo.name().equals(descricao)) {
+                return cargo;
+            }
+        }
+        return null;
+    }
 }

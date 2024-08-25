@@ -5,6 +5,7 @@ import com.simplesdental.teste.dtos.requests.ProfissionalRequest;
 import com.simplesdental.teste.dtos.responses.ProfissionalResponse;
 import com.simplesdental.teste.services.ProfissionalService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,9 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/profissionais")
+@Tag(name = "Profissionais")
 public class ProfissionalController {
+
     private static final Logger LOG = LoggerFactory.getLogger(ProfissionalController.class);
     private final ProfissionalService profissionalService;
 

@@ -28,7 +28,7 @@ public class ProfissionalServiceImpl implements ProfissionalService {
 
     @Override
     public Profissional adicionarProfissional(CriaProfissionalCommand command) {
-        Profissional profissional = Profissional.builder()
+        var profissional = Profissional.builder()
                 .nome(command.nome())
                 .cargo(command.cargo())
                 .dataNascimento(command.dataNascimento())

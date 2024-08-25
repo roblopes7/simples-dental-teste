@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplesdental.teste.commands.CriaProfissionalCommand;
 import com.simplesdental.teste.models.Profissional;
 import com.simplesdental.teste.persistence.repositories.ProfissionalRepository;
+import com.simplesdental.teste.persistence.utils.ModelsPersistenceUtils;
 import com.simplesdental.teste.services.exceptions.ObjetoNaoEncontradoException;
 import com.simplesdental.teste.services.exceptions.ValidationException;
 import com.simplesdental.teste.services.impl.ProfissionalServiceImpl;
@@ -41,6 +42,9 @@ public class ProfissionalServiceTest {
     private ProfissionalRepository profissionalRepository;
 
     @Mock
+    private ModelsPersistenceUtils modelsPersistenceUtils;
+
+    @Mock
     private ObjectMapper objectMapper;
 
     @InjectMocks
@@ -64,7 +68,10 @@ public class ProfissionalServiceTest {
         ValidationException exception = assertThrows(ValidationException.class, () -> {
             var command = new CriaProfissionalCommand("", "DESENVOLVEDOR", LocalDate.of(2000, 8, 24));
             profissionalService.adicionarProfissional(command);
-        }, "Campo nome vazio.");
+        });
+
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains("Campo nome vazio."));
     }
 
     @Test

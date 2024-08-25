@@ -1,7 +1,6 @@
 package com.simplesdental.teste.dtos.responses;
 
 import com.simplesdental.teste.dtos.ProfissionalDTO;
-import com.simplesdental.teste.models.Contato;
 import com.simplesdental.teste.models.Profissional;
 
 import java.time.LocalDate;
@@ -19,7 +18,10 @@ public record ProfissionalResponse(
 ) {
     public static ProfissionalResponse fromDomain(Profissional profissional) {
         List<ContatoResponse> contatosResponse = new ArrayList<>();
-        profissional.getContatos().forEach(contato -> contatosResponse.add(toResponse(contato)));
+
+        if (profissional.getContatos() != null && !profissional.getContatos().isEmpty()) {
+            profissional.getContatos().forEach(contato -> contatosResponse.add(ContatoResponse.fromDomain(contato)));
+        }
 
         return new ProfissionalResponse(
                 profissional.getId(),
@@ -33,8 +35,8 @@ public record ProfissionalResponse(
 
     public static ProfissionalResponse fromDTO(ProfissionalDTO dto) {
         List<ContatoResponse> contatosResponse = new ArrayList<>();
-        if(dto.getContatos() != null && !dto.getContatos().isEmpty()) {
-            dto.getContatos().forEach(contato -> contatosResponse.add(toResponse(contato)));
+        if (dto.getContatos() != null && !dto.getContatos().isEmpty()) {
+            dto.getContatos().forEach(contato -> contatosResponse.add(ContatoResponse.fromDomain(contato)));
         }
 
         return new ProfissionalResponse(
@@ -44,16 +46,6 @@ public record ProfissionalResponse(
                 dto.getDataNascimento(),
                 dto.getCreatedDate(),
                 contatosResponse
-        );
-    }
-
-    private static ContatoResponse toResponse(Contato contato) {
-        return new ContatoResponse(
-            contato.getId(),
-                contato.getNome(),
-                contato.getContato(),
-                contato.getCreatedDate(),
-                contato.getProfissional().getId()
         );
     }
 }
