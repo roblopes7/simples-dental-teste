@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -80,6 +82,19 @@ public class ContatoController {
         LOG.info("m=removerContato id={}", id);
         contatoService.removerContato(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "Listar/Filtrar contatos", method = "GET")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Map<String, Object>>> listarContatos(
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "fields", required = false) List<String> fields
+    ) {
+        LOG.info("m=listarContatos {}", q);
+
+        List<Map<String, Object>> contatos = contatoService.filtrarContatos(q, fields);
+
+        return ResponseEntity.ok(contatos);
     }
 
     private void adicionarLink(ContatoResponse response) {

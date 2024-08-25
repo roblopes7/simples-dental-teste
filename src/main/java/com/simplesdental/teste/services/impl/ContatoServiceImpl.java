@@ -1,5 +1,6 @@
 package com.simplesdental.teste.services.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplesdental.teste.commands.ContatoCommand;
 import com.simplesdental.teste.commands.CriaContatoCommand;
 import com.simplesdental.teste.models.Contato;
@@ -12,18 +13,20 @@ import com.simplesdental.teste.services.exceptions.ValidationException;
 import com.simplesdental.teste.services.utils.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.lang.reflect.Field;
+import java.util.*;
 
 @Service
 public class ContatoServiceImpl implements ContatoService {
 
     private final ContatoRepository contatoRepository;
     private final ProfissionalService profissionalService;
+    private final ObjectMapper objectMapper;
 
-    public ContatoServiceImpl(ContatoRepository contatoRepository, ProfissionalService profissionalService) {
+    public ContatoServiceImpl(ContatoRepository contatoRepository, ProfissionalService profissionalService, ObjectMapper objectMapper) {
         this.contatoRepository = contatoRepository;
         this.profissionalService = profissionalService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -68,6 +71,23 @@ public class ContatoServiceImpl implements ContatoService {
         contatoRepository.removerContato(id);
     }
 
+    @Override
+    public List<Map<String, Object>> filtrarContatos(String q, List<String> fields) {
+        List<Contato> contatos = contatoRepository.filtrarContatos(q);
+
+        List<Map<String, Object>> contatosDTO = new ArrayList<>();
+        boolean todosFields = (fields == null || fields.isEmpty());
+
+        for(Contato contato: contatos) {
+            if(todosFields) {
+                contatosDTO.add(converterModelParaMap(contato));
+            } else {
+                contatosDTO.add(adicionarCampoDeRetorno(fields, contato));
+            }
+        }
+        return contatosDTO;
+    }
+
     private Contato salvarContato(Contato contato) {
         return contatoRepository.salvarContato(contato);
     }
@@ -91,5 +111,23 @@ public class ContatoServiceImpl implements ContatoService {
             throw new ValidationException("Profissional não informado.");
         }
         return profissionalService.consultarProfissional(id);
+    }
+
+    private Map<String, Object> adicionarCampoDeRetorno(List<String> fields, Contato contato) {
+        Map<String, Object> dto = new HashMap<>();
+        for (String field : fields) {
+            try {
+                Field declaredField = Contato.class.getDeclaredField(field);
+                declaredField.setAccessible(true);
+                dto.put(field, declaredField.get(contato));
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new IllegalArgumentException("campo informado não existe em contato.");
+            }
+        }
+        return dto;
+    }
+
+    private Map<String, Object> converterModelParaMap(Contato contato) {
+        return objectMapper.convertValue(contato, Map.class);
     }
 }

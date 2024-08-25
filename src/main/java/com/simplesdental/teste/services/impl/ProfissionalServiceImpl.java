@@ -71,8 +71,8 @@ public class ProfissionalServiceImpl implements ProfissionalService {
     }
 
     @Override
-    public List<Map<String, Object>> listarProfissionais(String q, List<String> fields) {
-        List<Profissional> profissionais = profissionalRepository.listarTodos(q);
+    public List<Map<String, Object>> filtrarProfissionais(String q, List<String> fields) {
+        List<Profissional> profissionais = profissionalRepository.filtrarProfissionais(q);
 
         List<Map<String, Object>> profissionaisDTO = new ArrayList<>();
         boolean todosFields = (fields == null || fields.isEmpty());

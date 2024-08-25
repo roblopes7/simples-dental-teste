@@ -21,8 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -242,6 +241,60 @@ public class ContatoServiceTest {
 
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains("Contato de ID: " + uuidUtils.getUuidPadrao() + " não encontrado"));
+    }
+
+    // GET de listar/filtrar contatos
+
+    @Test
+    @DisplayName("Listar todos contatos com sucesso")
+    void listarTodosContatosComSucessoTest() {
+        when(contatoRepository.filtrarContatos(any(String.class))).thenReturn(ContatoTest.listaContatosMock());
+
+        List<Map<String, Object>> lista = contatoService.filtrarContatos("q", new ArrayList<>());
+
+        assertNotNull(lista);
+        verify(contatoRepository, Mockito.times(1)).filtrarContatos(any());
+        Assertions.assertThat(lista).hasSize(ContatoTest.listaContatosMock().size());
+    }
+
+    @Test
+    @DisplayName("Listar todos contatos enviando null fields com sucesso")
+    void listarTodosContatosComNullFieldsComSucessoTest() {
+        when(contatoRepository.filtrarContatos(any(String.class))).thenReturn(ContatoTest.listaContatosMock());
+
+        List<Map<String, Object>> lista = contatoService.filtrarContatos("q", null);
+
+        assertNotNull(lista);
+        verify(contatoRepository, Mockito.times(1)).filtrarContatos(any());
+        Assertions.assertThat(lista).hasSize(ContatoTest.listaContatosMock().size());
+    }
+
+    @Test
+    @DisplayName("Listar todos contatos com apenas nome sucesso")
+    void listarTodosContatosComApenasNomeTest() {
+        when(contatoRepository.filtrarContatos(any(String.class))).thenReturn(ContatoTest.listaContatosMock());
+
+        List<Map<String, Object>> lista = contatoService.filtrarContatos("", List.of("nome"));
+
+        assertNotNull(lista);
+        verify(contatoRepository, Mockito.times(1)).filtrarContatos(any());
+        for (Map<String, Object> contato : lista) {
+            Assertions.assertThat(contato).hasSize(1);
+            Assertions.assertThat(contato.get("nome")).isNotNull();
+        }
+
+    }
+
+    @Test
+    @DisplayName("listar contatos com erro de campo inexistente")
+    void listarContatosComCampoInexistenteTest() {
+        when(contatoRepository.filtrarContatos(any(String.class))).thenReturn(ContatoTest.listaContatosMock());
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> contatoService.filtrarContatos("", List.of("teste erro")));
+
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains("campo informado não existe em contato."));
     }
 
 }

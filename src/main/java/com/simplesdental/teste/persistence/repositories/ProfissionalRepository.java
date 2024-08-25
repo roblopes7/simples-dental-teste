@@ -13,7 +13,5 @@ public interface ProfissionalRepository {
 
     void inativarProfissional(Profissional profissional);
 
-    List<Profissional> listarTodos();
-
-    List<Profissional> listarTodos(String q);
+    List<Profissional> filtrarProfissionais(String q);
 }

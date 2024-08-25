@@ -50,16 +50,15 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
         profissionalRepositoryJPA.inativarProfissional(profissional.getId());
     }
 
-    @Override
     public List<Profissional> listarTodos() {
         return profissionalRepositoryJPA.findAll().stream().map(persistenceUtils::toDomain).toList();
     }
 
     @Override
-    public List<Profissional> listarTodos(String q) {
+    public List<Profissional> filtrarProfissionais(String q) {
         return StringUtils.isBlank(q) ?
                 listarTodos()
-                : listarTodos(
+                : filtrarProfissionais(
                 where(
                         isIdEqualsTo(q))
                         .or(isNomeContains(q))
@@ -69,7 +68,7 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
         );
     }
 
-    public List<Profissional> listarTodos(Specification<ProfissionalEntity> profissionalSpecification) {
+    public List<Profissional> filtrarProfissionais(Specification<ProfissionalEntity> profissionalSpecification) {
         return profissionalRepositoryJPA
                 .findAll(profissionalSpecification).stream()
                 .map(persistenceUtils::toDomain)

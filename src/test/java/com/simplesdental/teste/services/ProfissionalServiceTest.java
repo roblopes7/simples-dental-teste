@@ -233,36 +233,36 @@ public class ProfissionalServiceTest {
     @Test
     @DisplayName("Listar todos Profissionais com sucesso")
     void listarTodosProfissionaisComSucessoTest() {
-        when(profissionalRepository.listarTodos(any(String.class))).thenReturn(ProfissionalTest.listaProfissionaisMock());
+        when(profissionalRepository.filtrarProfissionais(any(String.class))).thenReturn(ProfissionalTest.listaProfissionaisMock());
 
-        List<Map<String, Object>> lista = profissionalService.listarProfissionais("q", new ArrayList<>());
+        List<Map<String, Object>> lista = profissionalService.filtrarProfissionais("q", new ArrayList<>());
 
         assertNotNull(lista);
-        verify(profissionalRepository, Mockito.times(1)).listarTodos(any());
+        verify(profissionalRepository, Mockito.times(1)).filtrarProfissionais(any());
         Assertions.assertThat(lista).hasSize(ProfissionalTest.listaProfissionaisMock().size());
     }
 
     @Test
     @DisplayName("Listar todos Profissionais enviando null fields com sucesso")
     void listarTodosProfissionaisComNullFieldsComSucessoTest() {
-        when(profissionalRepository.listarTodos(any(String.class))).thenReturn(ProfissionalTest.listaProfissionaisMock());
+        when(profissionalRepository.filtrarProfissionais(any(String.class))).thenReturn(ProfissionalTest.listaProfissionaisMock());
 
-        List<Map<String, Object>> lista = profissionalService.listarProfissionais("q", null);
+        List<Map<String, Object>> lista = profissionalService.filtrarProfissionais("q", null);
 
         assertNotNull(lista);
-        verify(profissionalRepository, Mockito.times(1)).listarTodos(any());
+        verify(profissionalRepository, Mockito.times(1)).filtrarProfissionais(any());
         Assertions.assertThat(lista).hasSize(ProfissionalTest.listaProfissionaisMock().size());
     }
 
     @Test
     @DisplayName("Listar todos Profissionais com apenas nome sucesso")
-    void listarTodosProfissionaisComApneasNomeTest() {
-        when(profissionalRepository.listarTodos(any(String.class))).thenReturn(ProfissionalTest.listaProfissionaisMock());
+    void listarTodosProfissionaisComApenasNomeTest() {
+        when(profissionalRepository.filtrarProfissionais(any(String.class))).thenReturn(ProfissionalTest.listaProfissionaisMock());
 
-        List<Map<String, Object>> lista = profissionalService.listarProfissionais("", List.of("nome"));
+        List<Map<String, Object>> lista = profissionalService.filtrarProfissionais("", List.of("nome"));
 
         assertNotNull(lista);
-        verify(profissionalRepository, Mockito.times(1)).listarTodos(any());
+        verify(profissionalRepository, Mockito.times(1)).filtrarProfissionais(any());
         for (Map<String, Object> profissional : lista) {
             Assertions.assertThat(profissional).hasSize(1);
             Assertions.assertThat(profissional.get("nome")).isNotNull();
@@ -273,10 +273,10 @@ public class ProfissionalServiceTest {
     @Test
     @DisplayName("listar Profissionais com erro de campo inexistente")
     void listarProfissionaisComCampoInexistenteTest() {
-        when(profissionalRepository.listarTodos(any(String.class))).thenReturn(ProfissionalTest.listaProfissionaisMock());
+        when(profissionalRepository.filtrarProfissionais(any(String.class))).thenReturn(ProfissionalTest.listaProfissionaisMock());
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> profissionalService.listarProfissionais("", List.of("teste erro")));
+                () -> profissionalService.filtrarProfissionais("", List.of("teste erro")));
 
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains("campo informado não existe em profissional."));

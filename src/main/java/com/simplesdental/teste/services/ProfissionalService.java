@@ -18,5 +18,5 @@ public interface ProfissionalService {
 
     void removerProfissional(UUID id);
 
-    List<Map<String, Object>> listarProfissionais(String q, List<String> fields);
+    List<Map<String, Object>> filtrarProfissionais(String q, List<String> fields);
 }

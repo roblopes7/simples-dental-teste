@@ -82,12 +82,12 @@ public class ProfissionalController {
     @Operation(summary = "Listar/Filtrar profissionais", method = "GET")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Map<String, Object>>> listarProfissionais(
-            @RequestParam("q") String q,
+            @RequestParam(value = "q", required = false) String q,
             @RequestParam(value = "fields", required = false) List<String> fields
     ) {
         LOG.info("m=listarProfissionais {}", q);
 
-        List<Map<String, Object>> profissionais = profissionalService.listarProfissionais(q, fields);
+        List<Map<String, Object>> profissionais = profissionalService.filtrarProfissionais(q, fields);
 
         return ResponseEntity.ok(profissionais);
     }
