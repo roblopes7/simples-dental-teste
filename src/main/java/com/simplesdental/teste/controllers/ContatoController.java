@@ -1,6 +1,8 @@
 package com.simplesdental.teste.controllers;
 
+import com.simplesdental.teste.dtos.requests.ContatoRequest;
 import com.simplesdental.teste.dtos.requests.NovoContatoRequest;
+import com.simplesdental.teste.dtos.requests.ProfissionalRequest;
 import com.simplesdental.teste.dtos.responses.ContatoResponse;
 import com.simplesdental.teste.dtos.responses.ProfissionalResponse;
 import com.simplesdental.teste.services.ContatoService;
@@ -57,6 +59,23 @@ public class ContatoController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "Atualizar um contato", method = "PUT")
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ContatoResponse> atualizarContato(
+            @PathVariable("id") UUID id,
+            @RequestBody ContatoRequest request) {
+        LOG.info("m=atualizarContato request={}", request);
+
+        var command = request.toCommand(id);
+
+        var contato = contatoService.atualizarContato(command);
+
+        var response = ContatoResponse.fromDomain(contato);
+        adicionarLink(response);
+
+        return ResponseEntity.ok(response);
+    }
+
     private void adicionarLink(ContatoResponse response) {
         response.add(
                 WebMvcLinkBuilder
@@ -64,5 +83,4 @@ public class ContatoController {
                                 .methodOn(ProfissionalController.class).consultarProfissional(response.getIdProfissional()))
                         .withRel("profissional"));
     }
-
 }

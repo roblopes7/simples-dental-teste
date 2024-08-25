@@ -1,5 +1,6 @@
 package com.simplesdental.teste.services.impl;
 
+import com.simplesdental.teste.commands.ContatoCommand;
 import com.simplesdental.teste.commands.CriaContatoCommand;
 import com.simplesdental.teste.models.Contato;
 import com.simplesdental.teste.models.Profissional;
@@ -35,7 +36,7 @@ public class ContatoServiceImpl implements ContatoService {
                 .build();
 
         validarContato(contato);
-        return contatoRepository.salvarContato(contato);
+        return salvarContato(contato);
     }
 
     @Override
@@ -47,6 +48,22 @@ public class ContatoServiceImpl implements ContatoService {
         }
 
         return contato.get();
+    }
+
+    @Override
+    public Contato atualizarContato(ContatoCommand command) {
+        Contato contato = consultarContato(command.id());
+
+        contato.setNome(command.nome());
+        contato.setContato(command.contato());
+
+        validarContato(contato);
+
+        return salvarContato(contato);
+    }
+
+    private Contato salvarContato(Contato contato) {
+        return contatoRepository.salvarContato(contato);
     }
 
     private void validarContato(Contato contato) {

@@ -3,7 +3,6 @@ package com.simplesdental.teste.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplesdental.teste.commands.CriaContatoCommand;
 import com.simplesdental.teste.models.Contato;
-import com.simplesdental.teste.models.Profissional;
 import com.simplesdental.teste.persistence.repositories.ContatoRepository;
 import com.simplesdental.teste.persistence.utils.ModelsPersistenceUtils;
 import com.simplesdental.teste.services.exceptions.ObjetoNaoEncontradoException;
@@ -162,11 +161,56 @@ public class ContatoServiceTest {
 
     @Test
     @DisplayName("Consultar Contato inexistente")
-    void consultarProfissionalInexistenteTest() {;
+    void consultarContatoInexistenteTest() {;
         when(contatoRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
         ObjetoNaoEncontradoException exception = assertThrows(ObjetoNaoEncontradoException.class, () -> {
             contatoService.consultarContato(uuidUtils.getUuidPadrao());
+        });
+
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains("Contato de ID: " + uuidUtils.getUuidPadrao() + " não encontrado"));
+    }
+
+    // UPDATE de contatos
+
+    @Test
+    @DisplayName("Atualização de Contato com sucesso")
+    void alterarContatoTest() {
+        when(profissionalService.consultarProfissional(any(UUID.class)))
+                .thenReturn(ProfissionalTest.criaProfissional());
+
+        Optional<Contato> consulta = Optional.of(ContatoTest.criaContato());
+        consulta.get().setId(uuidUtils.getUuidPadrao());
+        when(contatoRepository.findById(any(UUID.class))).thenReturn(consulta);
+
+        final String NOME = "NOME ALTERADO";
+        final String CONTATO = "CONTATO ALTERADO";
+
+        var alterado = Contato.builder()
+                .id(uuidUtils.getUuidPadrao())
+                .nome(NOME)
+                .contato(CONTATO)
+                .idProfissional(uuidUtils.getUuidProfissionalTest())
+                .build();
+
+        when(contatoRepository.salvarContato(any(Contato.class)))
+                .thenReturn(alterado);
+        Contato contato = contatoService.atualizarContato(ContatoCommandTest.criarCommandContato());
+
+        verify(contatoRepository, Mockito.times(1)).salvarContato(any(Contato.class));
+        Assertions.assertThat(contato.getId()).isEqualTo(uuidUtils.getUuidPadrao());
+        Assertions.assertThat(contato.getNome()).isEqualTo(NOME);
+        Assertions.assertThat(contato.getContato()).isEqualTo(CONTATO);
+    }
+
+    @Test
+    @DisplayName("Alterar Contato inexistente")
+    void alterarContatoInexistenteTest() {
+        when(contatoRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+
+        ObjetoNaoEncontradoException exception = assertThrows(ObjetoNaoEncontradoException.class, () -> {
+            contatoService.atualizarContato(ContatoCommandTest.criarCommandContato());
         });
 
         String actualMessage = exception.getMessage();
