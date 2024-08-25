@@ -3,8 +3,10 @@ package com.simplesdental.teste.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplesdental.teste.commands.CriaContatoCommand;
 import com.simplesdental.teste.models.Contato;
+import com.simplesdental.teste.models.Profissional;
 import com.simplesdental.teste.persistence.repositories.ContatoRepository;
 import com.simplesdental.teste.persistence.utils.ModelsPersistenceUtils;
+import com.simplesdental.teste.services.exceptions.ObjetoNaoEncontradoException;
 import com.simplesdental.teste.services.exceptions.ValidationException;
 import com.simplesdental.teste.services.impl.ContatoServiceImpl;
 import com.simplesdental.teste.services.impl.ProfissionalServiceImpl;
@@ -20,10 +22,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -140,6 +142,35 @@ public class ContatoServiceTest {
 
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains("Profissional não informado."));
+    }
+
+    //TESTES para GET por id
+
+    @Test
+    @DisplayName("Consultar Contato com sucesso")
+    void consultarContatoComSucessoTest() {
+        Optional<Contato> contato = Optional.of(ContatoTest.criaContato());
+        contato.get().setId(uuidUtils.getUuidPadrao());
+        when(contatoRepository.findById(any(UUID.class))).thenReturn(contato);
+
+        Contato consulta = contatoService.consultarContato(uuidUtils.getUuidPadrao());
+
+        assertNotNull(consulta);
+        verify(contatoRepository, Mockito.times(1)).findById(any());
+        Assertions.assertThat(consulta.getId()).isEqualTo(uuidUtils.getUuidPadrao());
+    }
+
+    @Test
+    @DisplayName("Consultar Contato inexistente")
+    void consultarProfissionalInexistenteTest() {;
+        when(contatoRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+
+        ObjetoNaoEncontradoException exception = assertThrows(ObjetoNaoEncontradoException.class, () -> {
+            contatoService.consultarContato(uuidUtils.getUuidPadrao());
+        });
+
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains("Contato de ID: " + uuidUtils.getUuidPadrao() + " não encontrado"));
     }
 
 }

@@ -2,20 +2,20 @@ package com.simplesdental.teste.controllers;
 
 import com.simplesdental.teste.dtos.requests.NovoContatoRequest;
 import com.simplesdental.teste.dtos.responses.ContatoResponse;
+import com.simplesdental.teste.dtos.responses.ProfissionalResponse;
 import com.simplesdental.teste.services.ContatoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/contatos")
@@ -39,16 +39,30 @@ public class ContatoController {
         var ContatoCriado = contatoService.adicionarContato(command);
         var response = ContatoResponse.fromDomain(ContatoCriado);
 
+        adicionarLink(response);
+
+        return ResponseEntity.created(URI.create("/contatos/%s".formatted(response.getId())))
+                .body(response);
+
+    }
+
+    @Operation(summary = "Consultar um contato", method = "GET")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ContatoResponse> consultarContato(@PathVariable("id") UUID id) {
+        LOG.info("m=consultarContato {}", id);
+
+        var contato = contatoService.consultarContato(id);
+        var response = ContatoResponse.fromDomain(contato);
+        adicionarLink(response);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private void adicionarLink(ContatoResponse response) {
         response.add(
                 WebMvcLinkBuilder
                         .linkTo(WebMvcLinkBuilder
                                 .methodOn(ProfissionalController.class).consultarProfissional(response.getIdProfissional()))
                         .withRel("profissional"));
-
-
-        return ResponseEntity.created(URI.create("/contatos/%s".formatted(response.getId())))
-                .body(response);
-
     }
 
 }

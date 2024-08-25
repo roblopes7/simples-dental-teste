@@ -6,10 +6,12 @@ import com.simplesdental.teste.models.Profissional;
 import com.simplesdental.teste.persistence.repositories.ContatoRepository;
 import com.simplesdental.teste.services.ContatoService;
 import com.simplesdental.teste.services.ProfissionalService;
+import com.simplesdental.teste.services.exceptions.ObjetoNaoEncontradoException;
 import com.simplesdental.teste.services.exceptions.ValidationException;
 import com.simplesdental.teste.services.utils.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,6 +36,17 @@ public class ContatoServiceImpl implements ContatoService {
 
         validarContato(contato);
         return contatoRepository.salvarContato(contato);
+    }
+
+    @Override
+    public Contato consultarContato(UUID id) {
+        Optional<Contato> contato = contatoRepository.findById(id);
+
+        if (contato.isEmpty()) {
+            throw new ObjetoNaoEncontradoException("Contato de ID: " + id + " não encontrado");
+        }
+
+        return contato.get();
     }
 
     private void validarContato(Contato contato) {

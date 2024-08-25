@@ -1,6 +1,8 @@
 package com.simplesdental.teste.persistence.repositories.impl;
 
 import com.simplesdental.teste.models.Contato;
+import com.simplesdental.teste.persistence.entities.ContatoEntity;
+import com.simplesdental.teste.persistence.entities.ProfissionalEntity;
 import com.simplesdental.teste.persistence.jpa.ContatoRepositoryJPA;
 import com.simplesdental.teste.persistence.jpa.ProfissionalRepositoryJPA;
 import com.simplesdental.teste.persistence.repositories.ContatoRepository;
@@ -8,6 +10,8 @@ import com.simplesdental.teste.persistence.utils.ModelsPersistenceUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class ContatoRepositoryImpl implements ContatoRepository {
@@ -32,6 +36,13 @@ public class ContatoRepositoryImpl implements ContatoRepository {
         }
 
         return persistenceUtils.toDomain(contatoRepositoryJPA.save(entity));
+    }
+
+    @Override
+    public Optional<Contato> findById(UUID id) {
+        Optional<ContatoEntity> optionalEntity = contatoRepositoryJPA.findById(id);
+        return optionalEntity.map(persistenceUtils::toDomain);
+
     }
 
 }
