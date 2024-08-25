@@ -1,5 +1,6 @@
 package com.simplesdental.teste.services.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplesdental.teste.commands.CriaProfissionalCommand;
 import com.simplesdental.teste.commands.ProfissionalCommand;
 import com.simplesdental.teste.models.Profissional;
@@ -11,17 +12,18 @@ import com.simplesdental.teste.services.exceptions.ValidationException;
 import com.simplesdental.teste.services.utils.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
+import java.lang.reflect.Field;
+import java.util.*;
 
 @Service
 public class ProfissionalServiceImpl implements ProfissionalService {
 
     private final ProfissionalRepository profissionalRepository;
+    private final ObjectMapper objectMapper;
 
-    public ProfissionalServiceImpl(ProfissionalRepository profissionalRepository) {
+    public ProfissionalServiceImpl(ProfissionalRepository profissionalRepository, ObjectMapper objectMapper) {
         this.profissionalRepository = profissionalRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -68,6 +70,23 @@ public class ProfissionalServiceImpl implements ProfissionalService {
         profissionalRepository.inativarProfissional(profissional);
     }
 
+    @Override
+    public List<Map<String, Object>> listarProfissionais(String q, List<String> fields) {
+        List<Profissional> profissionais = profissionalRepository.listarTodos(q);
+
+        List<Map<String, Object>> profissionaisDTO = new ArrayList<>();
+        boolean todosFields = (fields == null || fields.isEmpty());
+
+        for(Profissional profissional: profissionais) {
+            if(todosFields) {
+                profissionaisDTO.add(converterModelParaMap(profissional));
+            } else {
+                profissionaisDTO.add(adicionarCampoDeRetorno(fields, profissional));
+            }
+        }
+        return profissionaisDTO;
+    }
+
     public Profissional salvarProfissional(Profissional profissional) {
         return profissionalRepository.salvarProfissional(profissional);
     }
@@ -86,5 +105,23 @@ public class ProfissionalServiceImpl implements ProfissionalService {
                 throw new IllegalArgumentException("Cargo inválido: " + profissional.getCargo());
             }
         }
+    }
+
+    private Map<String, Object> adicionarCampoDeRetorno(List<String> fields, Profissional profissional) {
+        Map<String, Object> dto = new HashMap<>();
+        for (String field : fields) {
+            try {
+                Field declaredField = Profissional.class.getDeclaredField(field);
+                declaredField.setAccessible(true);
+                dto.put(field, declaredField.get(profissional));
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new IllegalArgumentException("campo informado não existe em profissional.");
+            }
+        }
+        return dto;
+    }
+
+    private Map<String, Object> converterModelParaMap(Profissional profissional) {
+        return objectMapper.convertValue(profissional, Map.class);
     }
 }

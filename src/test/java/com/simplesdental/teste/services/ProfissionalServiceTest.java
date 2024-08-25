@@ -1,5 +1,6 @@
 package com.simplesdental.teste.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simplesdental.teste.commands.CriaProfissionalCommand;
 import com.simplesdental.teste.models.Profissional;
 import com.simplesdental.teste.persistence.repositories.ProfissionalRepository;
@@ -22,9 +23,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,6 +39,9 @@ public class ProfissionalServiceTest {
 
     @Mock
     private ProfissionalRepository profissionalRepository;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @InjectMocks
     private ProfissionalServiceImpl profissionalService;
@@ -217,6 +219,61 @@ public class ProfissionalServiceTest {
 
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains("Profissional de ID: " + uuidUtils.getUuidPadrao() + " não encontrado"));
+    }
+
+    // GET de listar/filtrar profissionais
+
+    @Test
+    @DisplayName("Listar todos Profissionais com sucesso")
+    void listarTodosProfissionaisComSucessoTest() {
+        when(profissionalRepository.listarTodos(any(String.class))).thenReturn(ProfissionalTest.listaProfissionaisMock());
+
+        List<Map<String, Object>> lista = profissionalService.listarProfissionais("q", new ArrayList<>());
+
+        assertNotNull(lista);
+        verify(profissionalRepository, Mockito.times(1)).listarTodos(any());
+        Assertions.assertThat(lista).hasSize(ProfissionalTest.listaProfissionaisMock().size());
+    }
+
+    @Test
+    @DisplayName("Listar todos Profissionais enviando null fields com sucesso")
+    void listarTodosProfissionaisComNullFieldsComSucessoTest() {
+        when(profissionalRepository.listarTodos(any(String.class))).thenReturn(ProfissionalTest.listaProfissionaisMock());
+
+        List<Map<String, Object>> lista = profissionalService.listarProfissionais("q", null);
+
+        assertNotNull(lista);
+        verify(profissionalRepository, Mockito.times(1)).listarTodos(any());
+        Assertions.assertThat(lista).hasSize(ProfissionalTest.listaProfissionaisMock().size());
+    }
+
+    @Test
+    @DisplayName("Listar todos Profissionais com apenas nome sucesso")
+    void listarTodosProfissionaisComApneasNomeTest() {
+        when(profissionalRepository.listarTodos(any(String.class))).thenReturn(ProfissionalTest.listaProfissionaisMock());
+
+        List<Map<String, Object>> lista = profissionalService.listarProfissionais("", List.of("nome"));
+
+        assertNotNull(lista);
+        verify(profissionalRepository, Mockito.times(1)).listarTodos(any());
+        for (Map<String, Object> profissional : lista) {
+            Assertions.assertThat(profissional).hasSize(1);
+            Assertions.assertThat(profissional.get("nome")).isNotNull();
+        }
+
+    }
+
+    @Test
+    @DisplayName("listar Profissionais com erro de campo inexistente")
+    void listarProfissionaisComCampoInexistenteTest() {;
+        when(profissionalRepository.listarTodos(any(String.class))).thenReturn(ProfissionalTest.listaProfissionaisMock());
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            profissionalService.listarProfissionais("", List.of("teste erro"));
+        });
+
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains("campo informado não existe em profissional."));
     }
 
 }

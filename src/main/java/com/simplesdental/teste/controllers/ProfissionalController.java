@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -63,10 +65,23 @@ public class ProfissionalController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> removerProfissional(@PathVariable("id") UUID id){
+    public ResponseEntity<Void> removerProfissional(@PathVariable("id") UUID id) {
         LOG.info("m=removerProfissional id={}", id);
         profissionalService.removerProfissional(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Map<String, Object>>> listarProfissionais(
+            @RequestParam("q") String q,
+            @RequestParam(value = "fields", required = false) List<String> fields
+    ) {
+        LOG.info("m=listarProfissionais {}", q);
+
+        List<Map<String, Object>> profissionais = profissionalService.listarProfissionais(q, fields);
+
+        return ResponseEntity.ok(profissionais);
+    }
+
 
 }

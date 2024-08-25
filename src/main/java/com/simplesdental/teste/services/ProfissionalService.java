@@ -4,6 +4,8 @@ import com.simplesdental.teste.commands.CriaProfissionalCommand;
 import com.simplesdental.teste.commands.ProfissionalCommand;
 import com.simplesdental.teste.models.Profissional;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface ProfissionalService {
@@ -15,4 +17,6 @@ public interface ProfissionalService {
     Profissional atualizarProfissional(ProfissionalCommand command);
 
     void removerProfissional(UUID id);
+
+    List<Map<String, Object>> listarProfissionais(String q, List<String> fields);
 }

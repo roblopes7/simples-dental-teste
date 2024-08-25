@@ -1,5 +1,6 @@
 package com.simplesdental.teste.dtos.responses;
 
+import com.simplesdental.teste.dtos.ProfissionalDTO;
 import com.simplesdental.teste.models.Contato;
 import com.simplesdental.teste.models.Profissional;
 
@@ -26,6 +27,22 @@ public record ProfissionalResponse(
                 profissional.getCargo(),
                 profissional.getDataNascimento(),
                 profissional.getCreatedDate(),
+                contatosResponse
+        );
+    }
+
+    public static ProfissionalResponse fromDTO(ProfissionalDTO dto) {
+        List<ContatoResponse> contatosResponse = new ArrayList<>();
+        if(dto.getContatos() != null && !dto.getContatos().isEmpty()) {
+            dto.getContatos().forEach(contato -> contatosResponse.add(toResponse(contato)));
+        }
+
+        return new ProfissionalResponse(
+                dto.getId(),
+                dto.getNome(),
+                dto.getCargo(),
+                dto.getDataNascimento(),
+                dto.getCreatedDate(),
                 contatosResponse
         );
     }

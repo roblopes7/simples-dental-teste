@@ -7,11 +7,17 @@ import com.simplesdental.teste.persistence.entities.ContatoEntity;
 import com.simplesdental.teste.persistence.entities.ProfissionalEntity;
 import com.simplesdental.teste.persistence.jpa.ProfissionalRepositoryJPA;
 import com.simplesdental.teste.persistence.repositories.ProfissionalRepository;
+import com.simplesdental.teste.services.utils.StringUtils;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static com.simplesdental.teste.persistence.specifications.ProfissionalSpecification.*;
+import static org.springframework.data.jpa.domain.Specification.where;
 
 @Component
 public class ProfissionalRepositoryImpl implements ProfissionalRepository {
@@ -42,6 +48,29 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
     @Override
     public void inativarProfissional(Profissional profissional) {
         profissionalRepositoryJPA.inativarProfissional(profissional.getId());
+    }
+
+    @Override
+    public List<Profissional> listarTodos() {
+        return profissionalRepositoryJPA.findAll().stream().map(this::toDomain).toList();
+    }
+
+    @Override
+    public List<Profissional> listarTodos(String q) {
+        return StringUtils.isBlank(q) ?
+                listarTodos()
+                : listarTodos(
+                where(
+                        isIdEqualsTo(q))
+                        .or(isNomeContains(q))
+                        .or(isCargoContains(q))
+                        .or(isDataNascimentoEqualsTo(q))
+                        .or(isCreatedDateEqualsTo(q))
+        );
+    }
+
+    public List<Profissional> listarTodos(Specification<ProfissionalEntity> profissionalSpecification) {
+        return profissionalRepositoryJPA.findAll(profissionalSpecification).stream().map(this::toDomain).toList();
     }
 
     private ProfissionalEntity toEntity(Profissional profissional) {

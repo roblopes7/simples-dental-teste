@@ -2,6 +2,7 @@ package com.simplesdental.teste.persistence.repositories;
 
 import com.simplesdental.teste.models.Profissional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,4 +12,8 @@ public interface ProfissionalRepository {
     Optional<Profissional> findById(UUID id);
 
     void inativarProfissional(Profissional profissional);
+
+    List<Profissional> listarTodos();
+
+    List<Profissional> listarTodos(String q);
 }
