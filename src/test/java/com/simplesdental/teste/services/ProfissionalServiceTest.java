@@ -179,7 +179,7 @@ public class ProfissionalServiceTest {
 
     @Test
     @DisplayName("Alterar Profissional inexistente")
-    void alterarProfissionalInexistenteTest() {;
+    void alterarProfissionalInexistenteTest() {
         when(profissionalRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
         ObjetoNaoEncontradoException exception = assertThrows(ObjetoNaoEncontradoException.class, () -> {
@@ -210,7 +210,7 @@ public class ProfissionalServiceTest {
 
     @Test
     @DisplayName("Remover Profissional inexistente")
-    void removerProfissionalInexistenteTest() {;
+    void removerProfissionalInexistenteTest() {
         when(profissionalRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
         ObjetoNaoEncontradoException exception = assertThrows(ObjetoNaoEncontradoException.class, () -> {
@@ -265,12 +265,11 @@ public class ProfissionalServiceTest {
 
     @Test
     @DisplayName("listar Profissionais com erro de campo inexistente")
-    void listarProfissionaisComCampoInexistenteTest() {;
+    void listarProfissionaisComCampoInexistenteTest() {
         when(profissionalRepository.listarTodos(any(String.class))).thenReturn(ProfissionalTest.listaProfissionaisMock());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            profissionalService.listarProfissionais("", List.of("teste erro"));
-        });
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> profissionalService.listarProfissionais("", List.of("teste erro")));
 
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains("campo informado não existe em profissional."));
