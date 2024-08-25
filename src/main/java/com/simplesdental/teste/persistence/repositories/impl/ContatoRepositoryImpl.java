@@ -2,7 +2,6 @@ package com.simplesdental.teste.persistence.repositories.impl;
 
 import com.simplesdental.teste.models.Contato;
 import com.simplesdental.teste.persistence.entities.ContatoEntity;
-import com.simplesdental.teste.persistence.entities.ProfissionalEntity;
 import com.simplesdental.teste.persistence.jpa.ContatoRepositoryJPA;
 import com.simplesdental.teste.persistence.jpa.ProfissionalRepositoryJPA;
 import com.simplesdental.teste.persistence.repositories.ContatoRepository;
@@ -43,6 +42,11 @@ public class ContatoRepositoryImpl implements ContatoRepository {
         Optional<ContatoEntity> optionalEntity = contatoRepositoryJPA.findById(id);
         return optionalEntity.map(persistenceUtils::toDomain);
 
+    }
+
+    @Override
+    public void removerContato(UUID id) {
+        contatoRepositoryJPA.deleteById(id);
     }
 
 }

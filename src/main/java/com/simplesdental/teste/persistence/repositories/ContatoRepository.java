@@ -9,4 +9,6 @@ public interface ContatoRepository {
     Contato salvarContato(Contato contato);
 
     Optional<Contato> findById(UUID id);
+
+    void removerContato(UUID id);
 }

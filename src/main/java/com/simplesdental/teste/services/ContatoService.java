@@ -12,4 +12,6 @@ public interface ContatoService {
     Contato consultarContato(UUID id);
 
     Contato atualizarContato(ContatoCommand command);
+
+    void removerContato(UUID id);
 }

@@ -62,6 +62,12 @@ public class ContatoServiceImpl implements ContatoService {
         return salvarContato(contato);
     }
 
+    @Override
+    public void removerContato(UUID id) {
+        var contato = consultarContato(id);
+        contatoRepository.removerContato(id);
+    }
+
     private Contato salvarContato(Contato contato) {
         return contatoRepository.salvarContato(contato);
     }

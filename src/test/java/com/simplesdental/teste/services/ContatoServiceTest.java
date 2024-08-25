@@ -217,4 +217,31 @@ public class ContatoServiceTest {
         assertTrue(actualMessage.contains("Contato de ID: " + uuidUtils.getUuidPadrao() + " não encontrado"));
     }
 
+    //DETETE de contatos
+
+    @Test
+    @DisplayName("Remover Contato com sucesso")
+    void removerContatoTest() {
+        when(contatoRepository.findById(any(UUID.class)))
+                .thenReturn(Optional.of(ContatoTest.criaContato()));
+
+        contatoService.removerContato(uuidUtils.getUuidPadrao());
+
+        verify(contatoRepository, Mockito.times(1)).removerContato(any());
+    }
+
+    @Test
+    @DisplayName("Remover Profissional inexistente")
+    void removerProfissionalInexistenteTest() {
+        when(contatoRepository.findById(any(UUID.class)))
+                .thenReturn(Optional.empty());
+
+        ObjetoNaoEncontradoException exception = assertThrows(ObjetoNaoEncontradoException.class, () -> {
+            contatoService.removerContato(uuidUtils.getUuidPadrao());
+        });
+
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains("Contato de ID: " + uuidUtils.getUuidPadrao() + " não encontrado"));
+    }
+
 }

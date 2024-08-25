@@ -2,9 +2,7 @@ package com.simplesdental.teste.controllers;
 
 import com.simplesdental.teste.dtos.requests.ContatoRequest;
 import com.simplesdental.teste.dtos.requests.NovoContatoRequest;
-import com.simplesdental.teste.dtos.requests.ProfissionalRequest;
 import com.simplesdental.teste.dtos.responses.ContatoResponse;
-import com.simplesdental.teste.dtos.responses.ProfissionalResponse;
 import com.simplesdental.teste.services.ContatoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,7 +29,7 @@ public class ContatoController {
         this.contatoService = contatoService;
     }
 
-    @Operation(summary = "Cadastrar um Profissional", method = "POST")
+    @Operation(summary = "Cadastrar um Contato", method = "POST")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ContatoResponse> adicionarContato(@RequestBody NovoContatoRequest request) {
         LOG.info("m=adicionarContato request={}", request);
@@ -74,6 +72,14 @@ public class ContatoController {
         adicionarLink(response);
 
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Remover um contato", method = "DELETE")
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> removerContato(@PathVariable("id") UUID id) {
+        LOG.info("m=removerContato id={}", id);
+        contatoService.removerContato(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private void adicionarLink(ContatoResponse response) {
