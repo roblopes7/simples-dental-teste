@@ -1,0 +1,39 @@
+name: simples-dental
+version: '3.8'
+
+services:
+  app:
+    image: 'simples-dental-teste:latest'
+    build:
+      context: .
+    container_name: api
+    env_file: ./.env
+    depends_on:
+      - db
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:postgresql://db:5432/$DATABASE",
+        "spring.datasource.username" : "$DB_USERNAME",
+        "spring.datasource.password" : "$DB_PASSWORD",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.PostgreSQLDialect",
+        "spring.jpa.hibernate.ddl-auto" : "validate"
+      }'
+    ports:
+      - "${APP_PORT}:8080"
+    entrypoint: [ "wait-for-it.sh", "db:${DB_PORT}", "--", "java", "-jar", "/application.jar" ]
+
+  db:
+    image: postgres
+    container_name: db
+    env_file: ./.env
+    environment:
+      - POSTGRES_DB=${DATABASE}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - db:/var/lib/postgres
+
+volumes:
+  db:
