@@ -20,7 +20,7 @@ O projeto representa uma pequena aplicação de controle para profissionais e se
 
 # 3 - Arquitetura da API
 
-A arquitetura escolhida foi a MVC, conforme solicitado na documentação do teste. Para promover o desacoplamento, foram implementadas algumas práticas adicionais, como o uso de interfaces que isolam o framework das interfaceds de regras de negócio (service) e repositórios (repository).
+A arquitetura escolhida foi a MVC, conforme solicitado na documentação do teste. Para promover o desacoplamento, foram implementadas algumas práticas adicionais, como o uso de interfaces que isolam o framework das interfaces de regras de negócio (service) e repositórios (repository).
 
 Além disso, foi adotada a estrutura "Command" para a comunicação entre os endpoints (Controllers) e as regras de negócio (Services). Para garantir que os serviços não tenham acesso direto às entidades da API, foi criada uma camada de regras específica para o repositório, enquanto a persistência e as operações no banco de dados são gerenciadas por uma interface separada, acoplada ao framework (RepositoryJPA).
 
@@ -46,15 +46,11 @@ Além disso, foi adotada a estrutura "Command" para a comunicação entre os end
 | `PUT/{id}` | Editar as informações de um contato |
 | `DELETE/{id}` |  Remover um contato |
 
-# 5 - Swagger
-
-Para acessar os endpoints disponíveis, consulte o swagger: http://localhost:8080/swagger-ui/index.html#/ caso esteja usando outra porta ou ip alterar.
-
-# 6 - Javadocs
+# 5 - Javadocs
 
 Acesse a [javadocs do projeto.](https://roblopes7.github.io/simples-dental-teste/docs/)
 
-# 7 - Pré-requisitos
+# 6 - Pré-requisitos
 
 Para usar localmente é necessário o Java 17 e banco de dados Postgres.
 
@@ -74,13 +70,16 @@ Para o build usar o comando:
   - APP_PORT= Porta da API / Padrão(8080)
 
 
-# 8 - Docker
+# 7 - Docker
 
 Para subir a API pelo docker, defina as váriaveis de ambiente e use o comando:
 
    ```bash
    docker-compose up
   ```
+# 8 - Swagger
+
+Para acessar os endpoints disponíveis, consulte o swagger: http://localhost:8080/swagger-ui/index.html#/ caso esteja usando outra porta ou ip alterar.
 
 # 9 - DockerHub
 
